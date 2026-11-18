@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incidents
+  labels: {app: incidents}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: incidents}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
+  template:
+    metadata:
+      labels: {app: incidents}
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: incidents
+          image: aiip-incidents:dev
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef: {name: incidents}
+          env:
+            - {name: AUTH_URL, value: "http://auth.apps:8001"}
+            - {name: PROJECTS_URL, value: "http://projects.apps:8003"}
+            - {name: AI_BACKEND_URL, value: "http://ai-backend.apps:8000"}
+            - {name: PORT, value: "8006"}
+            - {name: BIND_HOST, value: "0.0.0.0"}
+          ports:
+            - {name: http, containerPort: 8006}
+          startupProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: {path: /ready, port: http}
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incidents
+spec:
+  selector: {app: incidents}
+  ports:
+    - {name: http, port: 8006, targetPort: http}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: incidents
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/v1/incidents
+            pathType: Prefix
+            backend: &incidents_backend
+              service: {name: incidents, port: {name: http}}
+          - path: /api/v1/overview
+            pathType: Exact
+            backend: *incidents_backend
+          - path: /api/v1/investigations
+            pathType: Prefix
+            backend: *incidents_backend
+          - path: /api/v1/evidence
+            pathType: Prefix
+            backend: *incidents_backend
+          - path: /api/v1/ingest/receipts
+            pathType: Prefix
+            backend: *incidents_backend
