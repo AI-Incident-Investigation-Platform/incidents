@@ -1,0 +1,143 @@
+[[scenario]]
+id = "INC-DB-001"
+title = "Схема содержит все таблицы владельца инцидентов"
+layer = "unit"
+domain = "db"
+
+[[scenario]]
+id = "INC-DB-002"
+title = "Уникальность алерта ограничена проектом и источником"
+layer = "unit"
+domain = "db"
+
+[[scenario]]
+id = "INC-DB-003"
+title = "У инцидента не более одного активного расследования"
+layer = "unit"
+domain = "db"
+
+[[scenario]]
+id = "INC-DB-004"
+title = "Гипотез у расследования не больше трёх"
+layer = "unit"
+domain = "db"
+
+[[scenario]]
+id = "INC-MAN-001"
+title = "Resolve запрещён при активном расследовании"
+layer = "unit"
+domain = "incidents"
+
+[[scenario]]
+id = "INC-MAN-002"
+title = "Закрытый инцидент можно открыть повторно"
+layer = "unit"
+domain = "incidents"
+
+[[scenario]]
+id = "INC-MAN-003"
+title = "Повторный Resolve сохраняет состояние"
+layer = "unit"
+domain = "incidents"
+
+[[scenario]]
+id = "INC-MAN-004"
+title = "Пустой заголовок при правке отвергается"
+layer = "unit"
+domain = "incidents"
+
+[[scenario]]
+id = "INC-MAN-005"
+title = "Описание можно очистить через PATCH"
+layer = "unit"
+domain = "incidents"
+
+[[scenario]]
+id = "INC-MAN-006"
+title = "Ручной инцидент создаётся, правится и закрывается через API"
+layer = "integration"
+domain = "incidents"
+
+[[scenario]]
+id = "INC-ALT-001"
+title = "Порядок labels не меняет ключ корреляции"
+layer = "unit"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-ALT-002"
+title = "После окончания окна тот же ключ даёт новый эпизод"
+layer = "unit"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-ALT-003"
+title = "Повтор алерта не создаёт инцидент, новый эпизод создаёт"
+layer = "integration"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-ALT-004"
+title = "Очередь алертов объявлена в RabbitMQ"
+layer = "integration"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-ALT-005"
+title = "Ключ ingest читает квитанции только своего проекта"
+layer = "integration"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-ALT-006"
+title = "Правило выбирается по приоритету и контролирует корреляцию и автостарт"
+layer = "unit"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-ALT-007"
+title = "Подходящее правило автоматически запускает только одно активное расследование"
+layer = "integration"
+domain = "alerts"
+
+[[scenario]]
+id = "INC-INV-001"
+title = "Вторая активная попытка запрещена"
+layer = "unit"
+domain = "investigations"
+
+[[scenario]]
+id = "INC-INV-002"
+title = "Retry создаёт следующий номер попытки"
+layer = "unit"
+domain = "investigations"
+
+[[scenario]]
+id = "INC-INV-003"
+title = "Start идемпотентен, Cancel и Retry работают в БД"
+layer = "integration"
+domain = "investigations"
+
+[[scenario]]
+id = "INC-AI-001"
+title = "Первый итог побеждает, Review не меняет RCA"
+layer = "integration"
+domain = "ai"
+
+[[scenario]]
+id = "INC-AI-002"
+title = "Потерянный Start подтверждается readback без новой попытки"
+layer = "integration"
+domain = "ai"
+
+[[scenario]]
+id = "INC-AI-003"
+title = "Cancel после потерянного ответа Start доставляется в AI"
+layer = "integration"
+domain = "ai"
+
+[[scenario]]
+id = "INC-DEL-001"
+title = "Удаление проекта очищает данные и сохраняет подтверждение при повторе"
+layer = "integration"
+domain = "cleanup"

@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: incidents-migrate
+  namespace: apps
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: migrate
+          image: aiip-incidents:dev
+          imagePullPolicy: IfNotPresent
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - secretRef: {name: incidents}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
